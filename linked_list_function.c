@@ -31,6 +31,7 @@ int print_list(node_t *head)
         printf("%d\n", current->val);
         current = current->next;
     }
+    return 0;
 }
 
 void push_ll(node_t *head, node_t *next_elem)
@@ -109,6 +110,7 @@ int push_index_ll(node_t *head, node_t *next_elem, int index)
     new_node->val = next_elem->val;
     new_node->next = current->next;
     current->next = new_node;
+    return 0;
 }
 
 int pop_index(node_t *head, int index)
@@ -180,6 +182,7 @@ int swap_(node_t **head, int index1, int index2)
     }
 
     *(int *)current->next = temp1;
+    return 0;
 }
 
 int search(node_t **head, int key)
