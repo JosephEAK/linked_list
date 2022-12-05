@@ -79,7 +79,7 @@ void test_push(void)
     CU_ASSERT(ptr->next->val == 10);
     CU_ASSERT(ptr->next->next->val == 5);
 
-    free(ptr);
+    free_list(pre_HEAD_1);
 }
 
 void test_pop(void)
@@ -104,7 +104,7 @@ void test_pop(void)
     CU_ASSERT(free_val == 5);
     CU_ASSERT(ptr->next->val == 7);
 
-    free(ptr);
+    free_list(HEAD);
 }
 
 void test_length_list(void)
@@ -121,6 +121,7 @@ void test_length_list(void)
 
     CU_ASSERT(length_list(HEAD) == 4);
     CU_ASSERT(length_list(elem2) == 2);
+    free_list(HEAD);
 }
 
 void test_swap_()
@@ -129,7 +130,6 @@ void test_swap_()
     node_t *elem1 = get_new_elem(5);
     node_t *elem2 = get_new_elem(7);
     node_t *elem3 = get_new_elem(72);
-    node_t *ptr = HEAD;
 
     node_t **ptr_HEAD = (node_t **)malloc(sizeof(node_t *));
     ptr_HEAD = &HEAD;
@@ -139,10 +139,12 @@ void test_swap_()
     push_ll(elem2, elem3);
 
     swap_(ptr_HEAD, 1, 3);
-    CU_ASSERT(ptr->next->val == 72);
+    CU_ASSERT(HEAD->next->val == 72);
 
     swap_(ptr_HEAD, 0, 1);
-    CU_ASSERT(ptr->val == 72);
+    CU_ASSERT(HEAD->val == 72);
+
+    free_list(HEAD);
 }
 
 void test_search(void)
@@ -151,7 +153,6 @@ void test_search(void)
     node_t *elem1 = get_new_elem(5);
     node_t *elem2 = get_new_elem(7);
     node_t *elem3 = get_new_elem(72);
-    // node_t *ptr = HEAD;
 
     node_t **ptr_HEAD = (node_t **)malloc(sizeof(node_t *));
     ptr_HEAD = &HEAD;
@@ -162,6 +163,7 @@ void test_search(void)
 
     CU_ASSERT(search(ptr_HEAD, 72) == 1);
     CU_ASSERT(search(ptr_HEAD, 11) == -1);
+    free_list(HEAD);
 }
 
 void test_free_list(void)
