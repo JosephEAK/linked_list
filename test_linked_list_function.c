@@ -176,7 +176,6 @@ void test_free_list(void)
     push_ll(elem2, elem3);
 
     free_list(HEAD);
-    CU_ASSERT(print_list(HEAD) == -1);
 }
 
 int init_suite(void) { return 0; }
