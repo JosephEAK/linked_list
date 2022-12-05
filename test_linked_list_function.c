@@ -79,7 +79,7 @@ void test_push(void)
     CU_ASSERT(ptr->next->val == 10);
     CU_ASSERT(ptr->next->next->val == 5);
 
-    free_list(HEAD);
+    free_list(pre_HEAD_1);
 }
 
 void test_pop(void)
@@ -144,7 +144,6 @@ void test_swap_()
     swap_(ptr_HEAD, 0, 1);
     CU_ASSERT(HEAD->val == 72);
 
-    free(ptr);
     free_list(HEAD);
 }
 
