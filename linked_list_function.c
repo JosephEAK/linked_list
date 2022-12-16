@@ -1,276 +1,306 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "linked_list_function.h"
 
-/*void init_list(node_t **head)
+linked_list *ll_get_new_elem(int data)
 {
-    time_t t1;
-    srand((unsigned)time(&t1));
-    node_t **current = head;
-    push_first(current, 5);
-    push_first(current, 4);
-    push_first(current, 3);
-    push_first(current, 2);
-    push_first(current, 1);
-}*/
+    linked_list *new_elem = (linked_list *)malloc(sizeof(linked_list));
 
-node_t *get_new_elem(int num)
-{
-    node_t *temp = (node_t *)malloc(sizeof(node_t));
-    temp->val = num;
-    return temp;
+    new_elem->data = data;
+    new_elem->next = NULL;
+
+    return new_elem;
 }
 
-int print_list(node_t *head)
+void ll_push_elem(linked_list *list, linked_list *elem)
 {
-    node_t *current = head;
+    linked_list *pt = list;
 
-    if (current == NULL)
-        return -1;
-
-    while (current != NULL)
+    while (pt->next != NULL)
     {
-        printf("%d\n", current->val);
-        current = current->next;
+        pt = pt->next;
     }
-    return 0;
+
+    pt->next = elem;
 }
 
-void push_ll(node_t *head, node_t *next_elem)
+void ll_pop(linked_list *list)
 {
-    node_t *first_current = head;
+    linked_list *pt = list;
+    linked_list *prev = NULL;
 
-    while (first_current->next != NULL)
+    if (pt->next == NULL)
     {
-        first_current = first_current->next;
+        return;
     }
-    first_current->next = next_elem;
+
+    while (pt->next != NULL)
+    {
+        prev = pt;
+        pt = pt->next;
+    }
+
+    prev->next = NULL;
+    free(pt);
 }
 
-int pop_last(node_t *head)
+void ll_free(linked_list *list)
 {
-    int retval = 0; // retrieve value
-    if (head->next == NULL)
-    {
-        retval = head->val;
-        free(head);
-        return retval;
-    }
+    linked_list *pt = list;
+    linked_list *pt_prev;
 
-    node_t *current = head;
-    while (current->next->next != NULL) // tant que la valeur de la prochaine prochaine valeur n'est pas NULL on itère. Puisque que l'on veut la derniere de la liste.
+    while (pt != NULL)
     {
-        current = current->next;
+        pt_prev = pt;
+        pt = pt->next;
+        free(pt_prev);
     }
-
-    retval = current->next->val;
-    free(current->next);  // on supprime de la memoire
-    current->next = NULL; // on y met NULL
-    return retval;
 }
 
-int length_list(node_t *head)
+int ll_length(linked_list *list)
 {
-    int count = 1;
+    linked_list *pt = list;
+    int len = 0;
 
-    if (head == NULL)
-        return 0;
-
-    if (head->next == NULL)
-        return 1;
-
-    node_t *current = head;
-
-    while (current->next != NULL)
+    while (pt != NULL)
     {
-        count += 1;
-        current = current->next;
+        pt = pt->next;
+        len++;
     }
-    return count;
+
+    return len;
 }
 
-int push_index_ll(node_t *head, node_t *next_elem, int index)
+void ll_print(linked_list *list)
 {
+    linked_list *pt;
+    pt = list;
 
-    int i;
-    node_t *current = head;
-    node_t *new_node = (node_t *)malloc(sizeof(node_t));
+    while (pt != NULL)
+    {
+        printf("[%d]->", pt->data);
+        pt = pt->next;
+    }
+    printf("\n");
+}
+
+void ll_add_index(linked_list **list, int index, linked_list *elem)
+{
+    linked_list *pt = *list;
+    linked_list *tmp;
+    int id = 0;
+    int len;
 
     if (index == 0)
-    {
-        // push_first(head, val);
-        return -1;
+    { // in case we want to replace the first elem
+        elem->next = *list;
+        *list = elem;
+        return;
     }
 
-    for (i = 0; i < index - 1; i++)
-    {
-        if (current->next == NULL)
-            return -1;
+    len = ll_length(*list);
 
-        current = current->next;
+    while (pt != NULL && id != index - 1 && id < len - 1)
+    {
+        pt = pt->next;
+        id++;
     }
-    new_node->val = next_elem->val;
-    new_node->next = current->next;
-    current->next = new_node;
-    return 0;
+
+    tmp = pt->next;
+    pt->next = elem;
+    elem->next = tmp;
 }
 
-int pop_index(node_t *head, int index)
+linked_list *ll_elem_at_index(linked_list *list, int index)
 {
-    int i;
-    int retval = -1;
-    node_t *current = head;
-    node_t *temp_node = NULL;
+    linked_list *pt = list;
+    int id = 0;
+    int len;
 
-    if (index == 0)
+    len = ll_length(list);
+
+    while (pt != NULL && id != index && id < len - 1)
     {
-        // return pop_first(head);
+        pt = pt->next;
+        id++;
     }
 
-    for (i = 0; i < index - 1; i++)
-    {
-        if (current->next == NULL)
-            return -1;
-
-        current = current->next;
-    }
-
-    temp_node = current->next;
-    current->next = temp_node->next;
-    retval = temp_node->val;
-    free(temp_node);
-
-    return retval;
+    return pt;
 }
 
-int swap_(node_t **head, int index1, int index2)
+void ll_swap_index_general(linked_list *list, int index0, int index1)
 {
-    node_t *current = *head;
-    int temp1 = 0, temp2 = 0, i = 0;
 
-    if (index2 < index1)
-    {
-        temp1 = index1;
-        index1 = index2;
-        index2 = temp1;
-    }
+    linked_list *elem0;
+    linked_list *elem0_prev;
+    linked_list *elem1;
+    linked_list *elem1_prev;
+    linked_list *elem1_next;
 
-    if (index1 == 0)
-        temp1 = **(int **)head;
+    elem0_prev = ll_elem_at_index(list, index0 - 1);
+    elem0 = elem0_prev->next;
 
-    for (i = 0; i < index2 - 1; i++)
-    {
-        if (current->next == NULL)
-            return -1;
+    elem1_prev = ll_elem_at_index(list, index1 - 1);
+    elem1 = elem1_prev->next;
 
-        if (i == index1 - 1 && index1 > 0)
-            temp1 = current->next->val;
+    elem1_next = elem1->next;
 
-        current = current->next;
-    }
-    temp2 = current->next->val;
+    elem0_prev->next = elem1;
+    elem1->next = elem0->next;
 
-    current = *head;
-
-    if (index1 == 0)
-        current->val = temp2;
-
-    for (i = 0; i < index2 - 1; i++)
-    {
-        if (i == index1 - 1 && index1 > 0)
-            *(int *)current->next = temp2;
-
-        current = current->next;
-    }
-
-    *(int *)current->next = temp1;
-    return 0;
+    elem1_prev->next = elem0;
+    elem0->next = elem1_next;
 }
 
-int search(node_t **head, int key)
+void ll_swap_index_glued(linked_list *list, int index0, int index1)
 {
-    node_t *current = *head;
-    while (current != NULL)
+
+    linked_list *elem0;
+    linked_list *elem0_prev;
+    linked_list *elem1;
+    linked_list *elem1_next;
+
+    elem0_prev = ll_elem_at_index(list, index0 - 1);
+    elem0 = elem0_prev->next;
+
+    elem1 = ll_elem_at_index(list, index1);
+    elem1_next = elem1->next;
+
+    elem0_prev->next = elem1;
+    elem1->next = elem0;
+    elem0->next = elem1_next;
+
+    /*
+    elem0_prec elem0 elem1 elem1_next
+    elem0_prec elem1 elem0 elem1_next
+    */
+}
+
+void ll_swap_head_headp1(linked_list **list)
+{
+    linked_list *elem0;
+    linked_list *elem1;
+    linked_list *elem1_next;
+
+    elem0 = *list;
+    elem1 = ll_elem_at_index(*list, 1);
+    elem1_next = elem1->next;
+
+    elem1->next = elem0;
+    elem0->next = elem1_next;
+
+    *list = elem1;
+
+    /*
+    elem0 elem1 elem1_next
+    elem1 elem0 elem1_next
+    */
+}
+
+void ll_swap_index_head(linked_list **list, int index0, int index1)
+{
+
+    linked_list *elem0;
+    linked_list *elem0_next;
+    linked_list *elem1;
+    linked_list *elem1_next;
+    linked_list *elem1_prev;
+
+    if (index0 + 1 == index1)
     {
-        if (current->val == key)
-            return 1;
-        current = current->next;
-    }
-    return -1;
-}
-
-void free_list(node_t *head)
-{
-    node_t *current;
-
-    while (head != NULL)
-    {
-        current = head;
-        head = head->next;
-        free(current);
-    }
-}
-
-/*
-void push_last(node_t *head, int val)
-{
-    node_t *current = head;
-    while (current->next != NULL)
-    {
-        current = current->next;
-    }
-
-    current->next = (node_t *)malloc(sizeof(node_t));
-    current->next->val = val;
-    current->next->next = NULL;
-}
-
-void push_first(node_t **head, int val)
-{
-    node_t *new_node;
-    new_node = (node_t *)malloc(sizeof(node_t));
-
-    new_node->val = val;
-    new_node->next = *head;
-    *head = new_node;
-}
-
-int pop_first(node_t **head)
-{
-    int retval = -1;
-    node_t *next_node = NULL;
-
-    if (*head == NULL)
-        return -1;
-
-    next_node = (*head)->next;
-    retval = (*head)->val;
-    free(*head);
-    (*head) = next_node;
-
-    return retval;
-}
-
-int push_index(node_t **head, int index, int val) // besoin d'un pointer de pointer, va pointer sur la liste
-{
-    int i;
-    node_t *current = *head;
-    node_t *new_node = (node_t *)malloc(sizeof(node_t));
-
-    if (index == 0)
-    {
-        push_first(head, val);
-        return -1;
+        ll_swap_head_headp1(list);
+        return;
     }
 
-    for (i = 0; i < index - 1; i++)
-    {
-        if (current->next == NULL)
-            return -1;
+    elem0 = *list;
+    elem0_next = elem0->next;
 
-        current = current->next;
-    }
-    new_node->val = val;
-    new_node->next = current->next;
-    current->next = new_node;
+    elem1_prev = ll_elem_at_index(*list, index1 - 1);
+    elem1 = elem1_prev->next;
+    elem1_next = elem1->next;
+
+    elem1->next = elem0_next;
+    *list = elem1;
+
+    elem1_prev->next = elem0;
+    elem0->next = elem1_next;
+
+    /*
+    elem0 elem0_next elem1_prev elem1 elem1_next
+    elem1 elem0_next elem1_prev elem0 elem1_next
+    */
 }
 
-*/
+void ll_swap_index(linked_list **list, int index0, int index1)
+{
+    /*linked_list* pt = *list;*/
+
+    if (index0 > index1)
+    { // we want index0 < index1
+        int tmp;
+        tmp = index1;
+        index1 = index0;
+        index0 = tmp;
+    }
+
+    if (index0 == 0)
+    {
+        ll_swap_index_head(list, index0, index1);
+    }
+    else if (index1 == index0 + 1)
+    {
+        ll_swap_index_glued(*list, index0, index1);
+    }
+    else
+    { // general case
+        ll_swap_index_general(*list, index0, index1);
+    }
+}
+
+void ll_reverse(linked_list **list)
+{
+    linked_list *elem_prev = NULL;
+    linked_list *elem = *list;
+    linked_list *elem_next = NULL;
+
+    while (elem != NULL)
+    {
+        elem_next = elem->next;
+        elem->next = elem_prev;
+        elem_prev = elem;
+        elem = elem_next;
+    }
+    *list = elem_prev;
+}
+
+void ll_remove_data_sup(linked_list **list, int value)
+{
+    // removes all elem with data > value
+
+    linked_list *pt = *list;
+    linked_list *pt_prev = NULL;
+
+    while (pt != NULL)
+    {
+        if (pt->data > value)
+        {
+            if (pt_prev != NULL)
+            {
+                pt_prev->next = pt->next;
+                free(pt);
+                pt = pt_prev->next;
+            }
+            else
+            { // this is the first elem
+                *list = pt->next;
+                free(pt);
+                pt = *list;
+            }
+        }
+        else
+        {
+            pt_prev = pt;
+            pt = pt->next;
+        }
+    }
+}
